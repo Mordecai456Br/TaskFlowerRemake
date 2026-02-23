@@ -1,4 +1,9 @@
-CREATE TYPE "public"."default_project_category" AS ENUM('Lazy Projects', 'Logic Projects', 'Backend', 'Frontend', 'Figma Projects', 'Fullstack');--> statement-breakpoint
+DO $$ BEGIN
+CREATE TYPE "public"."default_project_category" AS ENUM(...);
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
 CREATE TABLE "projects" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"title" text NOT NULL,

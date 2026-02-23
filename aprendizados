@@ -1,0 +1,3 @@
+[DATABASE DRIZZLE] Quando trocar o diretório do DB lembrar de alterar no
+"out" de drizzle.config.ts o novo path.
+

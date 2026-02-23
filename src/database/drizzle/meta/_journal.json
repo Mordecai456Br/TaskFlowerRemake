@@ -8,6 +8,20 @@
       "when": 1771656028960,
       "tag": "0000_nice_kree",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1771871318808,
+      "tag": "0001_familiar_nemesis",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1771871850549,
+      "tag": "0002_concerned_photon",
+      "breakpoints": true
     }
   ]
 }
