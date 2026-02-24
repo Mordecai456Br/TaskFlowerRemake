@@ -50,4 +50,11 @@ export const projectTagsRelations = relations(projectTags, ({one}) => ({
     })
 }));
 
+export type Project = typeof projects.$inferSelect;
+export type NewProject = typeof projects.$inferInsert;
 
+export type Tag = typeof tags.$inferSelect;
+export type NewTag = typeof tags.$inferInsert;
+
+export type ProjectTag = typeof projectTags.$inferSelect;
+export type NewProjectTag = typeof projectTags.$inferInsert;
