@@ -1,13 +1,53 @@
-import {pgTable, serial, text} from "drizzle-orm/pg-core";
+import {integer, pgTable, primaryKey, serial, text, varchar} from "drizzle-orm/pg-core";
 import {timestamps} from "../helpers/timestamps";
 import {default_project_category} from "../enums/defaultProjectCategoryEnum";
+import {tagsTypesEnum} from "../enums";
+import {relations} from "drizzle-orm";
 
 export const projects = pgTable('projects', {
     id: serial('id').primaryKey(),
-    title: text('title').notNull(),
-    description: text('description').notNull(),
-    projectCategory: default_project_category('category').notNull(),
-    projectTags: text('tags'),
-    mediaUrl: text('mediaUrl'),
+    title: varchar('title', {length: 50}).notNull(),
+    description: varchar('description', {length: 200}).notNull(),
+    category: default_project_category('category').notNull(),
+    mediaUrl: varchar('media_url'),
     ...timestamps
 });
+
+export const tags = pgTable('tags', {
+    id: serial('id').primaryKey(),
+    title: varchar('title', {length: 50}).notNull(),
+    type: tagsTypesEnum('type').notNull(),
+    ...timestamps
+});
+
+export const projectTags = pgTable('project_tags', {
+        projectId: integer('project_id').notNull().references(() => projects.id),
+        tagId: integer('tag_id').notNull().references(() => tags.id),
+    },
+    (table) => ({
+        pk: primaryKey({
+            columns: [table.projectId, table.tagId],
+        }),
+    })
+);
+
+export const projectRelations = relations(projects, ({many}) => ({
+    projectTags: many(projectTags),
+}));
+
+export const tagRelations = relations(tags, ({many}) => ({
+    projectTags: many(projectTags),
+}));
+
+export const projectTagsRelations = relations(projectTags, ({one}) => ({
+    project: one(projects, {
+        fields: [projectTags.projectId],
+        references: [projects.id],
+    }),
+    tag: one(tags, {
+        fields: [projectTags.tagId],
+        references: [tags.id],
+    })
+}));
+
+
