@@ -39,4 +39,15 @@ export const tagRelations = relations(tags, ({many}) => ({
     projectTags: many(projectTags),
 }));
 
+export const projectTagsRelations = relations(projectTags, ({one}) => ({
+    project: one(projects, {
+        fields: [projectTags.projectId],
+        references: [projects.id],
+    }),
+    tag: one(tags, {
+        fields: [projectTags.tagId],
+        references: [tags.id],
+    })
+}));
+
 
