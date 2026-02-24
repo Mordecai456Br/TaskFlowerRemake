@@ -32,11 +32,11 @@ export const projectTags = pgTable('project_tags', {
 );
 
 export const projectRelations = relations(projects, ({many}) => ({
-    tags: many(tags),
+    projectTags: many(projectTags),
 }));
 
 export const tagRelations = relations(tags, ({many}) => ({
-    projects: many(projects),
+    projectTags: many(projectTags),
 }));
 
 
