@@ -29,6 +29,41 @@
       "when": 1771873514467,
       "tag": "0003_handy_fabian_cortez",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1771944669711,
+      "tag": "0004_faulty_white_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1771955595130,
+      "tag": "0005_large_vampiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1771959876280,
+      "tag": "0006_broad_albert_cleary",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1771960619152,
+      "tag": "0007_safe_anita_blake",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1771961012507,
+      "tag": "0008_curvy_anita_blake",
+      "breakpoints": true
     }
   ]
 }
