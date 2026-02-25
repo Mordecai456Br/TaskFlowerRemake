@@ -1,8 +1,16 @@
 import express from 'express';
+import projectsRouter from "./routes/projects";
+import cors from "cors"
 
 const app = express();
 const port = 3000;
 
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}))
+app.use('/api/projects', projectsRouter);
 
 app.get('/', (req, res) => {
     res.send("Welcome to TaskFlower!")
