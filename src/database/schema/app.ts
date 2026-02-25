@@ -2,7 +2,7 @@ import {integer, pgTable, primaryKey, serial, text, varchar} from "drizzle-orm/p
 import {timestamps} from "../helpers/timestamps";
 import {relations} from "drizzle-orm";
 
-export const projectCategories = pgTable('categories_of_project', {
+export const categoriesOfProject = pgTable('categories_of_project', {
     id: serial('id').primaryKey(),
     name: varchar('name', {length: 50}).notNull().unique(),
     ...timestamps
@@ -20,7 +20,7 @@ export const projects = pgTable('projects', {
     description: varchar('description', {length: 200}).notNull(),
     categoryId: integer('category_id')
         .notNull()
-        .references(() => projectCategories.id),
+        .references(() => categoriesOfProject.id),
     mediaUrl: varchar('media_url'),
     ...timestamps
 });
@@ -48,9 +48,9 @@ export const projectTags = pgTable('project_tags', {
 
 export const projectRelations = relations(projects, ({many, one}) => ({
     projectTags: many(projectTags),
-    category: one(projectCategories, {
+    category: one(categoriesOfProject, {
         fields: [projects.categoryId],
-        references: [projectCategories.id],
+        references: [categoriesOfProject.id],
     }),
 }));
 
@@ -62,7 +62,7 @@ export const tagRelations = relations(tags, ({many, one}) => ({
     })
 }));
 
-export const projectCategoryRelations = relations(projectCategories, ({ many }) => ({
+export const projectCategoryRelations = relations(categoriesOfProject, ({ many }) => ({
     projects: many(projects),
 }));
 
@@ -90,8 +90,8 @@ export type NewTag = typeof tags.$inferInsert;
 export type ProjectTag = typeof projectTags.$inferSelect;
 export type NewProjectTag = typeof projectTags.$inferInsert;
 
-export type ProjectCategory = typeof projectCategories.$inferSelect;
-export type NewProjectCategory = typeof projectCategories.$inferInsert;
+export type ProjectCategory = typeof categoriesOfProject.$inferSelect;
+export type NewProjectCategory = typeof categoriesOfProject.$inferInsert;
 
 export type TagType = typeof tagTypes.$inferSelect;
 export type NewTagType = typeof tagTypes.$inferInsert;
