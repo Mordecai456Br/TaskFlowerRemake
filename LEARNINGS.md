@@ -12,3 +12,10 @@ ele nao incrementar.
 exemplo:
 id: serial('id').primaryKey()
 projectId: integer('project_id')
+
+[MIGRATIONS] Quando for mudar o tipo das tabelas (enum -> tabela relacional), deve
+criar uma nova coluna, depois transferir os dados de uma para outra, em seguida,
+remover. 
+Exemplo: Enum com categorias e agora quero categorias_id. Preciso criar e popular a tabela
+categorias, buscar e referenciar para trocar os antigos valores. Quando inserido novos
+valores, remover.
