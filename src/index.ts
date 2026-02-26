@@ -16,6 +16,7 @@ app.use(cors({
     credentials: true
 }));
 
+app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use(express.json());
 app.use(securityMiddleware);
 
@@ -28,6 +29,8 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Server started on http://localhost:${port}`);
 })
+
+app.use(express.json());
 
 app.use((req, res, next) => {
     const timestamp = new Date().toISOString();
