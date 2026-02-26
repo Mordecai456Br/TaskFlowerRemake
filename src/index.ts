@@ -1,6 +1,9 @@
 import express from 'express';
 import projectsRouter from "./routes/projects";
-import cors from "cors"
+import cors from "cors";
+import securityMiddleware from "./middleware/security.js";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth.js";
 
 const app = express();
 const port = 3000;
@@ -11,7 +14,12 @@ app.use(cors({
     origin: process.env.FRONTEND_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
-}))
+}));
+
+app.all("/api/auth/*splat", toNodeHandler(auth));
+app.use(express.json());
+app.use(securityMiddleware);
+
 app.use('/api/projects', projectsRouter);
 
 app.get('/', (req, res) => {
@@ -19,7 +27,7 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-    console.log(`Server starteddd on http://localhost:${port}`);
+    console.log(`Server started on http://localhost:${port}`);
 })
 
 app.use(express.json());
