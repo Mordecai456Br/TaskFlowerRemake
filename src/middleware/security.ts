@@ -31,7 +31,11 @@ const securityMiddleware = async (
     }
 
     try {
-        const role: RateLimitRole = req.user?.role ?? "guest";
+        const rawRole = req.user?.role;
+        const role: RateLimitRole = rawRole && rawRole in RATE_LIMITS
+        ? (rawRole as RateLimitRole)
+            : "guest";
+
         const {message} = RATE_LIMITS[role];
         const client = arcjetClients[role];
 
