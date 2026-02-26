@@ -1,9 +1,25 @@
-import { slidingWindow } from "@arcjet/node";
-import type { ArcjetNodeRequest } from "@arcjet/node";
-import type { NextFunction, Request, Response } from "express";
+import {slidingWindow} from "@arcjet/node";
+import type {ArcjetNodeRequest} from "@arcjet/node";
+import type {NextFunction, Request, Response} from "express";
 
 import aj from "../config/arcjet.js";
 
+const RATE_LIMITS = {
+    admin: {max: 20, message: "Admin request limit exceeded (20 per minute). Slow down!"},
+    user: {max: 10, message: "User request limit exceeded (10 per minute). Please wait."},
+    guest: {
+        max: 5,
+        message: "Guest request limit exceeded (5 per minute). Please sign up for higher limits.",
+    },
+} as const;
+
+type RateLimitRole = keyof typeof RATE_LIMITS;
+
+const arcjetClients: Record<RateLimitRole, ReturnType<typeof aj.withRule>> = {
+    admin: aj.withRule(slidingWindow({mode: "LIVE", interval: "1m", max: RATE_LIMITS.admin.max})),
+    user: aj.withRule(slidingWindow({mode: "LIVE", interval: "1m", max: RATE_LIMITS.user.max})),
+    guest: aj.withRule(slidingWindow({mode: "LIVE", interval: "1m", max: RATE_LIMITS.guest.max})),
+};
 const securityMiddleware = async (
     req: Request,
     res: Response,
@@ -16,33 +32,8 @@ const securityMiddleware = async (
 
     try {
         const role: RateLimitRole = req.user?.role ?? "guest";
-
-        let limit: number;
-        let message: string;
-
-        switch (role) {
-            case "admin":
-                limit = 20;
-                message = "Admin request limit exceeded (20 per minute). Slow down!";
-                break;
-            case "user":
-                limit = 10;
-                message = "User request limit exceeded (10 per minute). Please wait.";
-                break;
-            default:
-                limit = 5;
-                message =
-                    "Guest request limit exceeded (5 per minute). Please sign up for higher limits.";
-                break;
-        }
-
-        const client = aj.withRule(
-            slidingWindow({
-                mode: "LIVE",
-                interval: "1m",
-                max: limit,
-            })
-        );
+        const {message} = RATE_LIMITS[role];
+        const client = arcjetClients[role];
 
         const arcjetRequest: ArcjetNodeRequest = {
             headers: req.headers,
