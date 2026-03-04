@@ -22,6 +22,7 @@ export const projects = pgTable('projects', {
         .notNull()
         .references(() => categoriesOfProject.id),
     mediaUrl: varchar('media_url'),
+    githubUrl: varchar('github_url'),
     ...timestamps
 });
 
