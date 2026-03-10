@@ -1,5 +1,5 @@
 import {integer, pgTable, primaryKey, serial, text, varchar} from "drizzle-orm/pg-core";
-import {timestamps} from "../helpers/timestamps";
+import {timestamps} from "../helpers";
 import {relations} from "drizzle-orm";
 
 export const categoriesOfProject = pgTable('categories_of_project', {
