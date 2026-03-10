@@ -1,6 +1,7 @@
 import {boolean, timestamp, integer, pgEnum, pgTable, serial, varchar, text} from "drizzle-orm/pg-core";
 import {projects} from "./project";
 import {timestamps} from "../helpers";
+import {relations} from "drizzle-orm";
 import {user} from "./auth";
 
 
@@ -71,6 +72,43 @@ export const issues_properties_values = pgTable('issues_properties_values', {
         .references(() => property_select_options.id),
 ...timestamps
 })
+
+export const issuesProjectsRelations = relations (issues, ({ many, one }) => ({
+    issues: many(issues),
+    projects: one(projects, {
+        fields: [issues.projectId],
+        references: [projects.id]
+    })
+}));
+
+export const issuesStagesRelations = relations (issues, ({ many, one }) => ({
+    issues: many(issues),
+    stages: one(stages, {
+        fields: [issues.stageId],
+        references: [stages.id]
+    })
+}));
+
+export const stagesProjectsRelations = relations (stages, ({ one, many }) => ({
+    projects: one(projects, {
+        fields:[stages.projectId],
+        references:[projects.id]
+    }),
+    issues: many(issues)
+})) 
+
+export const stageProjectRelations = relations (projects, ({ one }) => ({
+    projects: one(projects)
+}))
+
+
+// projects 1 : n tasks
+// tasks n : 1 stages
+// tasks 1 : n pessoa
+// teams n : n projects
+// teams 1 : n pessoas
+// pessoa 1 : login
+
 
 export type Stage = typeof stages.$inferSelect;
 export type NewStage = typeof stages.$inferInsert;
