@@ -17,7 +17,7 @@ export const issuesPropertiesTypesEnum = pgEnum('issues_properties_types',
     ['STRING', 'NUMBER', 'SELECT', 'BOOLEAN', 'DATE'])
 
 export const stages = pgTable('stages', {
-    id: serial().primaryKey(),
+    id: serial('id').primaryKey(),
     title: varchar('title', {length: 50}).notNull(),
     description: varchar('description', {length: 50}).notNull(),
     order: integer('order').notNull().default(1),
@@ -27,7 +27,7 @@ export const stages = pgTable('stages', {
 })
 
 export const issues_properties = pgTable('issues_properties', {
-    id: serial().primaryKey(),
+    id: serial('id').primaryKey(),
     title: varchar('title', {length: 24}).notNull(),
     projectId: integer('project_id').references(() => projects.id).notNull(),
     type: issuesPropertiesTypesEnum('type').notNull(),
@@ -35,7 +35,7 @@ export const issues_properties = pgTable('issues_properties', {
 })
 
 export const property_select_options = pgTable('property_options', {
-    id: serial().primaryKey(),
+    id: serial('id').primaryKey(),
     propertyId: integer('property_id').references(() => issues_properties.id).notNull(),
     value: varchar('value'),
     color: varchar('color'),
@@ -43,7 +43,7 @@ export const property_select_options = pgTable('property_options', {
 })
 
 export const issues = pgTable('issues', {
-    id: serial().primaryKey(),
+    id: serial('id').primaryKey(),
     title: varchar('title', {length: 50}).notNull(),
     description: varchar('description', {length: 250}).notNull(),
     type: issuesTypesEnum('type').notNull(),
@@ -62,7 +62,7 @@ export const issues = pgTable('issues', {
 });
 
 export const issues_properties_values = pgTable('issues_properties_values', {
-    id: serial().primaryKey(),
+    id: serial('id').primaryKey(),
     issue_id: integer('issue_id').references(() => issues.id).notNull(),
     property_id: integer('property_id').references(() => issues_properties.id).notNull(),
     value_text: varchar('value_text'),
