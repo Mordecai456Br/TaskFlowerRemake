@@ -16,6 +16,12 @@ app.use(cors({
     credentials: true
 }));
 
+app.use((req, res, next) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${req.method} ${req.url}`);
+    next();
+})
+
 app.use(express.json());
 app.use(securityMiddleware);
 app.all("/api/auth/*splat", toNodeHandler(auth));
@@ -32,8 +38,3 @@ app.listen(port, () => {
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] ${req.method} ${req.url}`);
-    next();
-})
