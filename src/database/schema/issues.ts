@@ -1,8 +1,6 @@
-import {boolean, date, integer, pgEnum, pgTable, serial, varchar} from "drizzle-orm/pg-core";
-import {projects, projectTags} from "./project";
-import {localDate} from "drizzle-orm/gel-core";
+import {boolean, timestamp, integer, pgEnum, pgTable, serial, varchar, text} from "drizzle-orm/pg-core";
+import {projects} from "./project";
 import {timestamps} from "../helpers";
-import {type} from "node:os";
 import {user} from "./auth";
 
 
@@ -52,11 +50,11 @@ export const issues = pgTable('issues', {
     stageId: integer('stage_id')
         .references(() => stages.id),
     priority: prioritiesEnum('priority').notNull(),
-    created_by: integer('created_by').references(() => user.id).notNull(),
-    assigned_to: integer('assigned_to').references(() => user.id).notNull(),
-    deadline: date('deadline').notNull(),
-    estimatedTime: date('estimated_time'),
-    resolvedAt: date('resolved_at'),
+    created_by: text('created_by').references(() => user.id).notNull(),
+    assigned_to: text('assigned_to').references(() => user.id).notNull(),
+    deadline: timestamp('deadline').notNull(),
+    estimatedTime: integer('estimated_time'),
+    resolvedAt: timestamp('resolved_at'),
     ...timestamps
 
 });
@@ -67,17 +65,12 @@ export const issues_properties_values = pgTable('issues_properties_values', {
     property_id: integer('property_id').references(() => issues_properties.id).notNull(),
     value_text: varchar('value_text'),
     value_number: integer('value_number'),
-    value_date: date(),
+    value_timestamp: timestamp(),
     value_boolean: boolean('value_boolean'),
     value_select: integer('value_select')
-        .references(() => property_select_options.id).notNull(),
+        .references(() => property_select_options.id),
 ...timestamps
 })
-stages
-issues_properties
-property_select_options
-issues
-issues_properties_values
 
 export type Stage = typeof stages.$inferSelect;
 export type NewStage = typeof stages.$inferInsert;
