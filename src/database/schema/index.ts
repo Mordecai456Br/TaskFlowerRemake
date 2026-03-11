@@ -1,4 +1,4 @@
 export * from '../helpers';
 export * from './project';
-export * from './issues';
+export * from './tasks';
 export * from './auth'

@@ -1,7 +1,7 @@
 import {integer, pgTable, primaryKey, serial, text, varchar} from "drizzle-orm/pg-core";
 import {timestamps} from "../helpers";
 import {relations} from "drizzle-orm";
-import {stages} from './issues';
+import {stages} from './tasks';
 
 export const categoriesOfProject = pgTable('categories_of_project', {
     id: serial('id').primaryKey(),
