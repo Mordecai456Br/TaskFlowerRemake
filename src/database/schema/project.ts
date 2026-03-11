@@ -1,7 +1,7 @@
 import {integer, pgTable, primaryKey, serial, text, varchar} from "drizzle-orm/pg-core";
 import {timestamps} from "../helpers";
 import {relations} from "drizzle-orm";
-import {stages} from './issues.ts'; 
+import {stages} from './issues';
 
 export const categoriesOfProject = pgTable('categories_of_project', {
     id: serial('id').primaryKey(),
@@ -88,6 +88,9 @@ export const projectStageRelations = relations (projects, ({many}) => ({
 }))
 
 
+export const stageProjectRelations = relations (projects, ({ one }) => ({
+    projects: one(projects)
+}))
 
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;

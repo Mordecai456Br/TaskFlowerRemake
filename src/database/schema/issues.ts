@@ -1,4 +1,4 @@
-import {boolean, timestamp, integer, pgEnum, pgTable, serial, varchar, text} from "drizzle-orm/pg-core";
+import {boolean, timestamp, integer, pgEnum, pgTable, serial, varchar, text, date} from "drizzle-orm/pg-core";
 import {projects} from "./project";
 import {timestamps} from "../helpers";
 import {relations} from "drizzle-orm";
@@ -54,7 +54,7 @@ export const issues = pgTable('issues', {
     created_by: text('created_by').references(() => user.id).notNull(),
     assigned_to: text('assigned_to').references(() => user.id).notNull(),
     deadline: timestamp('deadline').notNull(),
-    estimatedTime: integer('estimated_time'),
+    estimatedTimeMinutes: integer('estimated_minutes'),
     resolvedAt: timestamp('resolved_at'),
     ...timestamps
 
@@ -97,9 +97,6 @@ export const stagesProjectsRelations = relations (stages, ({ one, many }) => ({
     issues: many(issues)
 })) 
 
-export const stageProjectRelations = relations (projects, ({ one }) => ({
-    projects: one(projects)
-}))
 
 
 // projects 1 : n tasks
