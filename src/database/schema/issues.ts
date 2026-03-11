@@ -9,10 +9,10 @@ export const prioritiesEnum = pgEnum('priorities',
     ['LOW', 'MEDIUM', 'HIGH']
 );
 
-export const issuesTypesEnum = pgEnum('issues_types',
+export const tasksTypesEnum = pgEnum('tasks_types',
     ['TASK', 'BUG', 'FEATURE', 'NOTE'])
 
-export const issuesPropertiesTypesEnum = pgEnum('issues_properties_types',
+export const tasksPropertiesTypesEnum = pgEnum('tasks_properties_types',
     ['STRING', 'NUMBER', 'SELECT', 'BOOLEAN', 'DATE'])
 
 export const stages = pgTable('stages', {
@@ -25,27 +25,27 @@ export const stages = pgTable('stages', {
 ...timestamps
 })
 
-export const issues_properties = pgTable('issues_properties', {
+export const tasks_properties = pgTable('tasks_properties', {
     id: serial('id').primaryKey(),
     title: varchar('title', {length: 24}).notNull(),
     projectId: integer('project_id').references(() => projects.id).notNull(),
-    type: issuesPropertiesTypesEnum('type').notNull(),
+    type: tasksPropertiesTypesEnum('type').notNull(),
         ...timestamps
 })
 
 export const property_select_options = pgTable('property_options', {
     id: serial('id').primaryKey(),
-    propertyId: integer('property_id').references(() => issues_properties.id).notNull(),
+    propertyId: integer('property_id').references(() => tasks_properties.id).notNull(),
     value: varchar('value'),
     color: varchar('color'),
     ...timestamps
 })
 
-export const issues = pgTable('issues', {
+export const tasks = pgTable('tasks', {
     id: serial('id').primaryKey(),
     title: varchar('title', {length: 50}).notNull(),
     description: varchar('description', {length: 250}).notNull(),
-    type: issuesTypesEnum('type').notNull(),
+    type: tasksTypesEnum('type').notNull(),
     projectId: integer('project_id').notNull()
         .references(() => projects.id),
     stageId: integer('stage_id')
@@ -60,10 +60,10 @@ export const issues = pgTable('issues', {
 
 });
 
-export const issues_properties_values = pgTable('issues_properties_values', {
+export const tasks_properties_values = pgTable('tasks_properties_values', {
     id: serial('id').primaryKey(),
-    issue_id: integer('issue_id').references(() => issues.id).notNull(),
-    property_id: integer('property_id').references(() => issues_properties.id).notNull(),
+    task_id: integer('issue_id').references(() => tasks.id).notNull(),
+    property_id: integer('property_id').references(() => tasks_properties.id).notNull(),
     value_text: varchar('value_text'),
     value_number: integer('value_number'),
     value_timestamp: timestamp(),
@@ -73,18 +73,18 @@ export const issues_properties_values = pgTable('issues_properties_values', {
 ...timestamps
 })
 
-export const issuesProjectsRelations = relations (issues, ({ many, one }) => ({
-    issues: many(issues),
+export const tasksProjectsRelations = relations (tasks, ({ many, one }) => ({
+    tasks: many(tasks),
     projects: one(projects, {
-        fields: [issues.projectId],
+        fields: [tasks.projectId],
         references: [projects.id]
     })
 }));
 
-export const issuesStagesRelations = relations (issues, ({ many, one }) => ({
-    issues: many(issues),
+export const tasksStagesRelations = relations (tasks, ({ many, one }) => ({
+    tasks: many(tasks),
     stages: one(stages, {
-        fields: [issues.stageId],
+        fields: [tasks.stageId],
         references: [stages.id]
     })
 }));
@@ -94,7 +94,7 @@ export const stagesProjectsRelations = relations (stages, ({ one, many }) => ({
         fields:[stages.projectId],
         references:[projects.id]
     }),
-    issues: many(issues)
+    tasks: many(tasks)
 })) 
 
 
@@ -110,14 +110,14 @@ export const stagesProjectsRelations = relations (stages, ({ one, many }) => ({
 export type Stage = typeof stages.$inferSelect;
 export type NewStage = typeof stages.$inferInsert;
 
-export type IssueProperties = typeof issues_properties.$inferSelect;
-export type NewIssueProperties = typeof issues_properties.$inferInsert;
+export type IssueProperties = typeof tasks_properties.$inferSelect;
+export type NewIssueProperties = typeof tasks_properties.$inferInsert;
 
 export type PropertySelectOptions = typeof property_select_options.$inferSelect;
 export type NewPropertySelectOptions = typeof property_select_options.$inferInsert;
 
-export type Issue = typeof issues.$inferSelect;
-export type NewIssue = typeof issues.$inferInsert;
+export type Issue = typeof tasks.$inferSelect;
+export type NewIssue = typeof tasks.$inferInsert;
 
-export type IssuesPropertiesValues = typeof issues_properties_values.$inferSelect;
-export type NewIssuesPropertiesValues = typeof issues_properties_values.$inferInsert;
+export type IssuesPropertiesValues = typeof tasks_properties_values.$inferSelect;
+export type NewIssuesPropertiesValues = typeof tasks_properties_values.$inferInsert;
