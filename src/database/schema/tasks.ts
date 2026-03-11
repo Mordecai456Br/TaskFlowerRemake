@@ -110,14 +110,14 @@ export const stagesProjectsRelations = relations (stages, ({ one, many }) => ({
 export type Stage = typeof stages.$inferSelect;
 export type NewStage = typeof stages.$inferInsert;
 
-export type IssueProperties = typeof tasks_properties.$inferSelect;
-export type NewIssueProperties = typeof tasks_properties.$inferInsert;
+export type TaskProperty = typeof tasks_properties.$inferSelect;
+export type NewTaskProperty = typeof tasks_properties.$inferInsert;
 
 export type PropertySelectOptions = typeof property_select_options.$inferSelect;
 export type NewPropertySelectOptions = typeof property_select_options.$inferInsert;
 
-export type Issue = typeof tasks.$inferSelect;
-export type NewIssue = typeof tasks.$inferInsert;
+export type Task = typeof tasks.$inferSelect;
+export type NewTask = typeof tasks.$inferInsert;
 
-export type IssuesPropertiesValues = typeof tasks_properties_values.$inferSelect;
-export type NewIssuesPropertiesValues = typeof tasks_properties_values.$inferInsert;
+export type TaskPropertyValue = typeof tasks_properties_values.$inferSelect;
+export type NewTaskPropertyValue = typeof tasks_properties_values.$inferInsert;

@@ -23,7 +23,7 @@ app.use((req, res, next) => {
 })
 
 app.use(express.json());
-app.use(securityMiddleware);
+//app.use(securityMiddleware);
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use('/api/projects', projectsRouter);
