@@ -78,6 +78,20 @@
       "when": 1773153895355,
       "tag": "0010_pale_meteorite",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1773232130369,
+      "tag": "0011_slippery_the_executioner",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1773232858238,
+      "tag": "0012_unusual_wallow",
+      "breakpoints": true
     }
   ]
 }
