@@ -1,6 +1,6 @@
 {
-  "id": "44917c69-8e8e-419e-a96a-2f45b6f74fb6",
-  "prevId": "4dfb8da8-3a31-42ff-b6b0-4d46354c8193",
+  "id": "593471ec-e4b5-4d2f-ae76-16ca0f587ca0",
+  "prevId": "44917c69-8e8e-419e-a96a-2f45b6f74fb6",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -48,7 +48,7 @@
           "name": "created_by_user",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
