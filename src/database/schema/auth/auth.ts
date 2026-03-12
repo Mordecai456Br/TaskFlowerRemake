@@ -8,6 +8,8 @@ import {
     timestamp,
     uniqueIndex,
 } from "drizzle-orm/pg-core";
+import {tasks} from "../tasks";
+import {projects} from "../projects";
 
 const timestamps = {
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -92,25 +94,6 @@ export const verification = pgTable(
         identifierIdx: index("verification_identifier_idx").on(table.identifier),
     })
 );
-
-export const usersRelations = relations(user, ({ many }) => ({
-    sessions: many(session),
-    accounts: many(account),
-}));
-
-export const sessionsRelations = relations(session, ({ one }) => ({
-    user: one(user, {
-        fields: [session.userId],
-        references: [user.id],
-    }),
-}));
-
-export const accountsRelations = relations(account, ({ one }) => ({
-    user: one(user, {
-        fields: [account.userId],
-        references: [user.id],
-    }),
-}));
 
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
