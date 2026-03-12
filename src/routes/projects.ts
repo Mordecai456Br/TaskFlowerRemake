@@ -3,6 +3,7 @@ import {and, count, desc, eq, getTableColumns, ilike, or, sql} from "drizzle-orm
 import {categoriesOfProject, projects, projectTags} from "../database/schema";
 import {neonDatabase} from "../database";
 import {formatQueryString} from "./helpers/queryStringFormater";
+import { neon } from '@neondatabase/serverless';
 
 const router = express.Router();
 
@@ -66,5 +67,34 @@ router.get('/', async (req, res) => {
         }
     }
 );
+
+// router.post('/', async (req, res) => {  
+//     try {
+//         const { title, description, categoryId, mediaUrl, githubUrl, createdByUser, tagIds } = req.body;
+
+//         if (!title || !description || !categoryId || !createdByUser) { 
+//             res.status(400).json({ error: 'Missing required fields: title, description, categoryId, createdByUser' });
+//             return;
+//         }
+//         const result = await neonDatabase.transaction(async (transc) => {
+//             const [newProject] = await transc.insert(projects).values({
+//                 title,
+//                 description,
+//                 categoryId,
+//                 mediaUrl,
+//                 githubUrl,
+//                 createdByUser
+//             }).returning();
+//             await transc.insert(projectTags).values(
+//                 tagIds.map((tagId: number) => ({
+//                     projectId: newProject.id,
+//                     tagId
+//                 }))
+//             );
+//             return newProject;
+//         }); 
+//     }
+
+// });
 
 export default router;

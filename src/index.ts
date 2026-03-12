@@ -1,5 +1,7 @@
 import express from 'express';
 import projectsRouter from "./routes/projects";
+import tagTypesRouter from "./routes/tagTypes";
+import tagRouter from './routes/tags';
 import cors from "cors";
 import securityMiddleware from "./middleware/security.js";
 import { toNodeHandler } from "better-auth/node";
@@ -23,8 +25,10 @@ app.use((req, res, next) => {
 })
 
 app.use(express.json());
-app.all("/api/auth/*splat", toNodeHandler(auth));
+// app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use('/api/projects', projectsRouter);
+app.use('/api/tag-type', tagTypesRouter);
+app.use('/api/tag', tagRouter);
 
 //app.use(securityMiddleware);
 
