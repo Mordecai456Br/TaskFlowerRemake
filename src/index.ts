@@ -23,10 +23,10 @@ app.use((req, res, next) => {
 })
 
 app.use(express.json());
-app.use(securityMiddleware);
 app.all("/api/auth/*splat", toNodeHandler(auth));
-
 app.use('/api/projects', projectsRouter);
+
+//app.use(securityMiddleware);
 
 app.get('/', (req, res) => {
     res.send("Welcome to TaskFlower!")
