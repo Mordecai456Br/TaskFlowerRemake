@@ -34,13 +34,11 @@ router.get('/', async (req, res) => {
 
             const whereClause = filterConditions.length > 0 ? and(...filterConditions) : undefined;
 
-
             const countResult = await neonDatabase
                 .select({count: sql<number>`count(*)`})
                 .from(projects)
                 .leftJoin(categoriesOfProject, eq(projects.categoryId, categoriesOfProject.id))
                 .where(whereClause);
-
             const totalCount = Number(countResult[0]?.count ?? 0);
 
             const projectsList = await neonDatabase.select({
@@ -68,33 +66,62 @@ router.get('/', async (req, res) => {
     }
 );
 
-// router.post('/', async (req, res) => {  
-//     try {
-//         const { title, description, categoryId, mediaUrl, githubUrl, createdByUser, tagIds } = req.body;
+router.post('/', async (req, res) => {  
+    try {
 
-//         if (!title || !description || !categoryId || !createdByUser) { 
-//             res.status(400).json({ error: 'Missing required fields: title, description, categoryId, createdByUser' });
-//             return;
-//         }
-//         const result = await neonDatabase.transaction(async (transc) => {
-//             const [newProject] = await transc.insert(projects).values({
-//                 title,
-//                 description,
-//                 categoryId,
-//                 mediaUrl,
-//                 githubUrl,
-//                 createdByUser
-//             }).returning();
-//             await transc.insert(projectTags).values(
-//                 tagIds.map((tagId: number) => ({
-//                     projectId: newProject.id,
-//                     tagId
-//                 }))
-//             );
-//             return newProject;
-//         }); 
-//     }
+        const {title, description, categoryId, mediaUrl, githubUrl, createdByUser} = req.body;
 
-// });
+        if (!title && description && categoryId && createdByUser) {
+            return res.status(400).json({ error: 'Is required: title, description, categoryId, createdByUser'});
+        }
+
+        
+        const [findCreatedByUserTitle, findCategoryId] = await Promise.all([
+            neonDatabase
+            .select()
+            .from(projects)
+            .where(
+                and(
+                    eq(projects.createdByUser, createdByUser),
+                    eq(projects.title, title)
+                ))
+            .limit(1),
+            neonDatabase
+            .select()
+            .from(categoriesOfProject)
+            .where(eq(categoriesOfProject.id, categoryId))
+            .limit(1)
+        ]);
+
+        const isSameTitle = findCreatedByUserTitle[0];
+        const resultCategory = findCategoryId[0];
+
+        if (isSameTitle) {
+            return res.status(409).json();
+        }
+        if (!resultCategory) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+
+        const [newProject] = await neonDatabase 
+            .insert(projects)
+            .values({
+                title: title,
+                description: description,
+                categoryId: categoryId,
+                mediaUrl: mediaUrl,
+                githubUrl: githubUrl,
+                createdByUser: createdByUser
+            })
+            .onConflictDoNothing()
+            .returning();
+        if (!newProject) {
+            return res.status(409).json({ error: `You already created a project with the title '${title}'` });
+        }
+        return res.status(201).json(newProject);
+    } catch {
+        res.status(500).json()
+    }        
+});
 
 export default router;
