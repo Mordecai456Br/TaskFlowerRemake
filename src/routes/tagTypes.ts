@@ -16,7 +16,7 @@ router.post('/', async(req, res) => {
         const [newType] = await neonDatabase
             .insert(tagTypes)
             .values({
-                name: name,
+                name: name
             })
             .returning();
         res.status(201).json(newType);
