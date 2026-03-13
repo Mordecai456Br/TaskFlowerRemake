@@ -7,6 +7,8 @@ import {stages} from "../stages/stages";
 import {tasks} from "../tasks/tasks";
 import {user} from "../auth/auth";
 import {tasks_properties} from "../tasks/tasksProperties";
+import {projectTeams} from "./projectTeams";
+import {teams} from "../teams/teams";
 
 export const projectsRelations = relations(projects, ({one, many}) => ({
     projectTags: many(projectTags),
@@ -37,3 +39,8 @@ export const projectTagsRelations = relations(projectTags, ({one}) => ({
         references: [tags.id]
     })
 }) )
+
+export const projectTeamsRelations = relations(projectTeams, ({many}) => ({
+    project: many(projects),
+    teams: many(teams),
+}))
