@@ -3,7 +3,6 @@ import {and, count, desc, eq, getTableColumns, ilike, or, sql} from "drizzle-orm
 import {categoriesOfProject, projects, projectTags} from "../database/schema";
 import {neonDatabase} from "../database";
 import {formatQueryString} from "./helpers/queryStringFormater";
-import { neon } from '@neondatabase/serverless';
 
 const router = express.Router();
 
@@ -71,7 +70,7 @@ router.post('/', async (req, res) => {
 
         const {title, description, categoryId, mediaUrl, githubUrl, createdByUser} = req.body;
 
-        if (!title && description && categoryId && createdByUser) {
+        if (!title && !description && !categoryId && !createdByUser) {
             return res.status(400).json({ error: 'Is required: title, description, categoryId, createdByUser'});
         }
 
