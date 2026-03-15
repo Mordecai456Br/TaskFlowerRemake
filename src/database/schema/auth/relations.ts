@@ -2,12 +2,14 @@ import {relations} from "drizzle-orm";
 import {tasks} from "../tasks";
 import {projects} from "../projects";
 import {account, session, user} from "./auth";
+import {teams} from "../teams/teams";
 
 export const usersRelations = relations(user, ({ many }) => ({
     sessions: many(session),
     accounts: many(account),
     task: many(tasks),
-    project: many(projects)
+    project: many(projects),
+    teams: many(teams),
 }));
 
 export const sessionsRelations = relations(session, ({ one }) => ({
@@ -23,3 +25,4 @@ export const accountsRelations = relations(account, ({ one }) => ({
         references: [user.id],
     }),
 }));
+
