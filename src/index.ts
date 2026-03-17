@@ -33,7 +33,7 @@ app.use('/api/projects', projectsRouter);
 app.use('/api/tag-type', tagTypesRouter);
 app.use('/api/tag', tagRouter);
 app.use('/api/project-tags', projectTags);
-app.use('/api/categorie-project', categorieProject);
+app.use('/api/categories-project', categorieProject);
 app.use('/api/projects/create-project', projectsRouter);
 app.use('/api/stages', stages);
 
