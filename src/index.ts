@@ -3,7 +3,7 @@ import projectsRouter from "./routes/projects";
 import tagTypesRouter from "./routes/tagTypes";
 import tagRouter from './routes/tags';
 import projectTags from './routes/projectTags';
-import categorieProject from './routes/categories';
+import categorieProject from './routes/categoriesOfProject';
 import stages from './routes/stages';
 import cors from "cors";
 import securityMiddleware from "./middleware/security.js";

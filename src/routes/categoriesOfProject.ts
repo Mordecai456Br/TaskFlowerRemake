@@ -21,15 +21,15 @@ router.post('/', async(req, res) => {
             .limit(1);
         const result = findName[0];
         if (result) {
-            return res.status(409).json({error: `A record with this "${name}" already exists.`})
+            return res.status(409).json({error: `A record with the name "${name}" already exists.`})
         }
-        const [newCatProject] = await neonDatabase
+        const [newCategoryOfProject] = await neonDatabase
             .insert(categoriesOfProject)
             .values({
                 name: name
             })
             .returning();
-        res.status(201).json(newCatProject);
+        res.status(201).json(newCategoryOfProject);
     } catch {
         res.status(500).json()
     } 
