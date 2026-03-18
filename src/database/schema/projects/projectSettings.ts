@@ -10,5 +10,5 @@ id: serial('id').primaryKey(),
         .unique(),
 })
 
-export type ProjectSettings = typeof projects.$inferSelect;
-export type NewProjectSettings = typeof projects.$inferInsert;
+export type ProjectSettings = typeof projectSettings.$inferSelect;
+export type NewProjectSettings = typeof projectSettings.$inferInsert;

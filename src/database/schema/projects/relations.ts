@@ -23,7 +23,8 @@ export const projectsRelations = relations(projects, ({one, many}) => ({
     createdByUser: one(user, {
         fields: [projects.createdByUser],
         references: [user.id]
-    })
+    }),
+    settings: one(projectSettings),
 }))
 
 export const categoriesOfProjects = relations(categoriesOfProject, ({many}) => ({
@@ -39,7 +40,6 @@ export const projectTagsRelations = relations(projectTags, ({one}) => ({
         fields: [projectTags.tagId],
         references: [tags.id]
     }),
-    settings: one(projectSettings),
 }) )
 
 export const projectTeamsRelations = relations(projectTeams, ({many}) => ({
