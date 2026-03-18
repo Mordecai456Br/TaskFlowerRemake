@@ -8,27 +8,78 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
         try {
-            const {search, category, tags, page = 1, limit = 10} = req.query;
+            const {search, category, tagsQuery, matchAllTags = 'false', page = 1, limit = 10} = req.query;
 
             const currentPage = Math.max(1, parseInt(String(page), 10) || 1);
             const limitPerPage = Math.min(Math.max(1, parseInt(String(limit), 10) || 10), 100);
 
             const offset = (currentPage - 1) * limitPerPage;
 
+            const requireAllTags = String(matchAllTags).toLowerCase() === 'true';
+
             const filterConditions = [];
             if (search) {
+
+
                 filterConditions.push(
                     or(
                         ilike(projects.title, `%${search}%`),
                         ilike(projects.description, `%${search}%`)
                     )
                 );
+
+
             }
+
             const normalizedCategory = formatQueryString(category)
             if (normalizedCategory) {
                 filterConditions.push(
                     ilike(categoriesOfProject.name, `%${normalizedCategory}%`),
                 );
+            }
+
+            const normalizedTags = formatQueryString(tagsQuery)?.split(",")
+                .map(Number)
+                .filter(Boolean)?? [];
+
+            if (normalizedTags.length) {
+
+                if (requireAllTags) {
+
+                    // MATCH ALL TAGS
+                    filterConditions.push(
+                        sql`EXISTS (
+                        SELECT ${projectTags.projectId}
+                        FROM ${projectTags}
+                        WHERE ${projectTags.projectId} = ${projects.id}
+                        AND ${projectTags.tagId} IN (${sql.join(normalizedTags.map(tag => sql`${tag}`), sql`,`)})
+                        GROUP BY ${projectTags.projectId}
+                        HAVING COUNT(DISTINCT ${projectTags.tagId}) = ${normalizedTags.length}
+    )`
+                    );
+
+
+                } else {
+
+                    // MATCH ANY TAG
+                    filterConditions.push(
+                        sql`EXISTS(
+                        SELECT * FROM
+                        ${projectTags}
+                        WHERE
+                        ${projectTags.projectId}
+                        =
+                        ${projects.id}
+                        AND
+                        ${projectTags.tagId}
+                        IN
+                        (
+                        ${sql.join(normalizedTags.map(tag => sql`${tag}`), sql`,`)}
+                        )
+                        )`
+                    )
+                }
+
             }
 
             const whereClause = filterConditions.length > 0 ? and(...filterConditions) : undefined;
@@ -42,9 +93,34 @@ router.get('/', async (req, res) => {
 
             const projectsList = await neonDatabase.select({
                 ...getTableColumns(projects),
-                category: {...getTableColumns(categoriesOfProject)}
-            }).from(projects).leftJoin(categoriesOfProject, eq(projects.categoryId, categoriesOfProject.id))
+                category: {...getTableColumns(categoriesOfProject)},
+                tags: sql`
+                    COALESCE(
+            json_agg(
+                DISTINCT jsonb_build_object(
+                    'id',
+                    ${tags.id},
+                    'name',
+                    ${tags.title}
+                    )
+                    )
+                    FILTER
+                    (
+                    WHERE
+                    ${tags.id}
+                    IS
+                    NOT
+                    NULL
+                    ),
+                    '[]'
+                    )
+                `
+            }).from(projects)
+                .leftJoin(categoriesOfProject, eq(projects.categoryId, categoriesOfProject.id))
+                .leftJoin(projectTags, eq(projectTags.projectId, projects.id))
+                .leftJoin(tags, eq(tags.id, projectTags.tagId))
                 .where(whereClause)
+                .groupBy(projects.id, categoriesOfProject.id)
                 .orderBy(desc(projects.created_at))
                 .limit(limitPerPage)
                 .offset(offset);
