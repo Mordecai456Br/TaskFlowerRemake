@@ -9,6 +9,7 @@ import {user} from "../auth/auth";
 import {tasks_properties} from "../tasks/tasksProperties";
 import {projectTeams} from "./projectTeams";
 import {teams} from "../teams/teams";
+import {projectSettings} from "./projectSettings";
 
 export const projectsRelations = relations(projects, ({one, many}) => ({
     projectTags: many(projectTags),
@@ -37,10 +38,18 @@ export const projectTagsRelations = relations(projectTags, ({one}) => ({
     tag: one(tags, {
         fields: [projectTags.tagId],
         references: [tags.id]
-    })
+    }),
+    settings: one(projectSettings),
 }) )
 
 export const projectTeamsRelations = relations(projectTeams, ({many}) => ({
     project: many(projects),
     teams: many(teams),
+}))
+
+export const projectSettingsRelations = relations(projectSettings, ({one}) => ({
+    project: one(projects, {
+        fields: [projectSettings.projectId],
+        references: [projects.id]
+    }),
 }))
