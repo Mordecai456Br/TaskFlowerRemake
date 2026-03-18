@@ -56,7 +56,42 @@ router.post('/', async(req, res) => {
         res.status(500).json()
     }
     
-})
+});
+
+router.get('/project=:id/tags', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const projectId = Number(id);
+        if (!projectId) {
+            return res.status(400).json({ error: 'Invalid project ID format' });
+        }
+        const projectTagsList = await neonDatabase
+            .select({
+                id: tags.id,
+                title: tags.title,
+            })
+            .from(tags)
+            .rightJoin(projectTags, eq(tags.id, projectTags.tagId))
+            .where(eq(projectTags.projectId, projectId));
+        return res.status(200).json(projectTagsList);
+        
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve tags for this project' });
+    }
+});
+
+router.get('/', async (req, res) => {
+    try {
+        const findProjectTags = await neonDatabase
+            .select()
+            .from(projectTags)
+        const result = findProjectTags;
+        return res.status(200).json(result);
+        
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve tags for this project' });
+    }
+});
 
 
 export default router;

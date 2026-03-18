@@ -1,5 +1,5 @@
 import express from 'express';
-import {and, desc, eq, getTableColumns, ilike, or, sql} from "drizzle-orm";
+import {and, count, desc, eq, getTableColumns, ilike, or, sql} from "drizzle-orm";
 import {categoriesOfProject, projects, projectTags, tags} from "../database/schema";
 import {neonDatabase} from "../database";
 import {formatQueryString} from "./helpers/queryStringFormater";
@@ -8,78 +8,27 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
         try {
-            const {search, category, tagsQuery, matchAllTags = 'false', page = 1, limit = 10} = req.query;
+            const {search, category, tags, page = 1, limit = 10} = req.query;
 
             const currentPage = Math.max(1, parseInt(String(page), 10) || 1);
             const limitPerPage = Math.min(Math.max(1, parseInt(String(limit), 10) || 10), 100);
 
             const offset = (currentPage - 1) * limitPerPage;
 
-            const requireAllTags = String(matchAllTags).toLowerCase() === 'true';
-
             const filterConditions = [];
             if (search) {
-
-
                 filterConditions.push(
                     or(
                         ilike(projects.title, `%${search}%`),
                         ilike(projects.description, `%${search}%`)
                     )
                 );
-
-
             }
-
             const normalizedCategory = formatQueryString(category)
             if (normalizedCategory) {
                 filterConditions.push(
                     ilike(categoriesOfProject.name, `%${normalizedCategory}%`),
                 );
-            }
-
-            const normalizedTags = formatQueryString(tagsQuery)?.split(",")
-                .map(Number)
-                .filter(Boolean)?? [];
-
-            if (normalizedTags.length) {
-
-                if (requireAllTags) {
-
-                    // MATCH ALL TAGS
-                    filterConditions.push(
-                        sql`EXISTS (
-                        SELECT ${projectTags.projectId}
-                        FROM ${projectTags}
-                        WHERE ${projectTags.projectId} = ${projects.id}
-                        AND ${projectTags.tagId} IN (${sql.join(normalizedTags.map(tag => sql`${tag}`), sql`,`)})
-                        GROUP BY ${projectTags.projectId}
-                        HAVING COUNT(DISTINCT ${projectTags.tagId}) = ${normalizedTags.length}
-    )`
-                    );
-
-
-                } else {
-
-                    // MATCH ANY TAG
-                    filterConditions.push(
-                        sql`EXISTS(
-                        SELECT * FROM
-                        ${projectTags}
-                        WHERE
-                        ${projectTags.projectId}
-                        =
-                        ${projects.id}
-                        AND
-                        ${projectTags.tagId}
-                        IN
-                        (
-                        ${sql.join(normalizedTags.map(tag => sql`${tag}`), sql`,`)}
-                        )
-                        )`
-                    )
-                }
-
             }
 
             const whereClause = filterConditions.length > 0 ? and(...filterConditions) : undefined;
@@ -93,34 +42,9 @@ router.get('/', async (req, res) => {
 
             const projectsList = await neonDatabase.select({
                 ...getTableColumns(projects),
-                category: {...getTableColumns(categoriesOfProject)},
-                tags: sql`
-                    COALESCE(
-            json_agg(
-                DISTINCT jsonb_build_object(
-                    'id',
-                    ${tags.id},
-                    'name',
-                    ${tags.title}
-                    )
-                    )
-                    FILTER
-                    (
-                    WHERE
-                    ${tags.id}
-                    IS
-                    NOT
-                    NULL
-                    ),
-                    '[]'
-                    )
-                `
-            }).from(projects)
-                .leftJoin(categoriesOfProject, eq(projects.categoryId, categoriesOfProject.id))
-                .leftJoin(projectTags, eq(projectTags.projectId, projects.id))
-                .leftJoin(tags, eq(tags.id, projectTags.tagId))
+                category: {...getTableColumns(categoriesOfProject)}
+            }).from(projects).leftJoin(categoriesOfProject, eq(projects.categoryId, categoriesOfProject.id))
                 .where(whereClause)
-                .groupBy(projects.id, categoriesOfProject.id)
                 .orderBy(desc(projects.created_at))
                 .limit(limitPerPage)
                 .offset(offset);
@@ -197,6 +121,54 @@ router.post('/', async (req, res) => {
     } catch {
         res.status(500).json()
     }        
+});
+
+router.put('/:id', async (req, res) => {
+    try {
+        const {id}  = req.params;
+        const projectId = Number(id);
+        const { title, description, categoryId, mediaUrl, githubUrl } = req.body;
+        const [updatedProject] = await neonDatabase
+            .update(projects)
+            .set({
+                title,
+                description,
+                categoryId,
+                mediaUrl,
+                githubUrl
+            })
+            .where(eq(projects.id, projectId))
+            .returning();
+        if (!updatedProject) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+        return res.status(200).json(updatedProject);
+
+    } catch {
+        res.status(500).json({ error: 'Failed to update project' });
+    }
+}); 
+
+router.get('/:id/tag', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const projectId = Number(id);
+        if (!projectId) {
+            return res.status(400).json({ error: 'Invalid project ID format' });
+        }
+        const projectTagsList = await neonDatabase
+            .select({
+                id: tags.id,
+                title: tags.title,
+            })
+            .from(tags)
+            .leftJoin(projectTags, eq(tags.id, projectTags.tagId))
+            .where(eq(projectTags.projectId, projectId));
+        return res.status(200).json(projectTagsList);
+        
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve tags for this project' });
+    }
 });
 
 export default router;

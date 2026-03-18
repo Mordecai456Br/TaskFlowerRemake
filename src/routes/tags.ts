@@ -1,6 +1,6 @@
 import express from 'express';
 import { and, asc, eq, ilike, or, sql } from 'drizzle-orm';
-import { tags, tagTypes } from '../database/schema';
+import { tags, tagTypes, projects, projectTags } from '../database/schema';
 import { neonDatabase } from '../database';
 
 const router = express.Router();
@@ -57,5 +57,29 @@ router.get('/', async (req, res) => {
 });
 
 
+router.get('/:id/projects', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const tagId = Number(id);
+
+        if (isNaN(tagId)) {
+            return res.status(400).json({ error: 'Invalid tag ID format' });
+        }
+
+        const projectsWithTag = await neonDatabase
+            .select({
+                id: projects.id,
+                title: projects.title,
+                description: projects.description,
+            })
+            .from(projects)
+            .leftJoin(projectTags, eq(projects.id, projectTags.projectId))
+            .where(eq(projectTags.tagId, tagId));
+        return res.status(200).json(projectsWithTag);
+        
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve projects for this tag' });
+    }
+});
 
 export default router;
