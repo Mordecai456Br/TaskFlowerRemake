@@ -42,14 +42,26 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {  
-    const findProject = await neonDatabase 
-        .select()
-        .from(stages)
-    const result = findProject
-    if (!result) {
-        return res.status(404).json({message: "vazio"})
+
+    try {
+
+        const findProject = await neonDatabase 
+            .select({
+                id: stages.id,
+                title: stages.title,
+                description: stages.description,
+                order: stages.order,
+                projectId: stages.projectId
+            })
+            .from(stages)
+        const result = findProject
+        if (!result ) {
+            return res.status(404).json({message: ""}) //gabrelo adicionar message aqui;
+        }
+        return res.status(200).json(result)
+    } catch (error) {
+        return res.status(500).json({ message: "" }); //gabrelo adicionar message aqui;
     }
-    return res.status(200).json(result)
 })
 
 export default router;

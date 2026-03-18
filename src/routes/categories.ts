@@ -36,5 +36,24 @@ router.post('/', async(req, res) => {
 
 })
 
+router.get('/', async (req, res) => {
+    try {
+        const findTag = await neonDatabase
+            .select({
+                id: categoriesOfProject.id,
+                name: categoriesOfProject.name
+            })
+            .from(categoriesOfProject)
+        const result = findTag;
+        if(!result) {
+            res.status(404).json({message: ""}) //colocar a mensagem aqui gabrelo;
+        }
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json();
+    }
+});
+
+
 
 export default router;
