@@ -56,13 +56,59 @@ router.get('/', async (req, res) => {
             .from(stages)
         const result = findProject
         if (!result ) {
-            return res.status(404).json({message: ""}) //gabrelo adicionar message aqui;
+            return res.status(404).json({ error: 'Stage not found' });
         }
         return res.status(200).json(result)
     } catch (error) {
-        return res.status(500).json({ message: "" }); //gabrelo adicionar message aqui;
+        res.status(500).json({ error: 'Failed to update stage' });
     }
 })
+
+router.put('/:id', async (req, res) => {
+    try {
+        const {id} = req.params;
+        const stageId = Number(id);
+        const { title, description, order } = req.body;
+
+        const [updatedStage] = await neonDatabase
+            .update(stages)
+            .set({
+                title,
+                description,
+                order
+            })
+            .where(eq(stages.id, stageId))
+            .returning();
+        if (!updatedStage) {
+            return res.status(404).json({ error: 'Stage not found' });
+        }
+
+        return res.status(200).json(updatedStage);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update stage' });
+    }
+});
+
+router.get('/:id', async (req, res) => {
+    try {
+        const {id} = req.params;
+        const stageId = Number(id);        
+        const stageResult = await neonDatabase
+            .select()
+            .from(stages)
+            .where(eq(stages.id, stageId))
+            .limit(1);
+
+        const result = stageResult[0];   
+        if (!result) {
+            return res.status(404).json({ error: 'Stage not found' });
+        }
+        return res.status(200).json(stageResult[0]);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve stage' });
+    }
+});
+
 
 export default router;
 
