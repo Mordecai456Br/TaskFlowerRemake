@@ -1,5 +1,5 @@
 import express from 'express';
-import {and, count, desc, eq, getTableColumns, ilike, or, sql} from "drizzle-orm";
+import {and, desc, eq, getTableColumns, ilike, or, sql} from "drizzle-orm";
 import {categoriesOfProject, projects, projectTags, tags} from "../database/schema";
 import {neonDatabase} from "../database";
 import {formatQueryString} from "./helpers/queryStringFormater";
@@ -38,7 +38,9 @@ router.get('/', async (req, res) => {
                 );
             }
 
-            const normalizedTags = formatQueryString(tagsQuery)?.split(",") ?? [];
+            const normalizedTags = formatQueryString(tagsQuery)?.split(",")
+                .map(Number)
+                .filter(Boolean)?? [];
 
             if (normalizedTags.length) {
 
@@ -47,68 +49,35 @@ router.get('/', async (req, res) => {
                     // MATCH ALL TAGS
                     filterConditions.push(
                         sql`EXISTS (
-                SELECT 1
-                FROM
-                        ${projectTags}
-                        INNER
-                        JOIN
-                        ${tags}
-                        ON
-                        ${tags.id}
-                        =
-                        ${projectTags.tagId}
-                        WHERE
-                        ${projectTags.projectId}
-                        =
-                        ${projects.id}
-                        AND
-                        ${tags.title}
-                        IN
-                        (
-                        ${sql.join(normalizedTags.map(t => sql`${t}`), sql`,`)}
-                        )
-                        GROUP
-                        BY
-                        ${projectTags.projectId}
-                        HAVING
-                        COUNT
-                        (
-                        DISTINCT
-                        ${tags.title}
-                        )
-                        =
-                        ${normalizedTags.length}
-                        )`
+                        SELECT ${projectTags.projectId}
+                        FROM ${projectTags}
+                        WHERE ${projectTags.projectId} = ${projects.id}
+                        AND ${projectTags.tagId} IN (${sql.join(normalizedTags.map(tag => sql`${tag}`), sql`,`)})
+                        GROUP BY ${projectTags.projectId}
+                        HAVING COUNT(DISTINCT ${projectTags.tagId}) = ${normalizedTags.length}
+    )`
                     );
+
 
                 } else {
 
                     // MATCH ANY TAG
                     filterConditions.push(
-                        sql`EXISTS (
-                SELECT 1
-                FROM
+                        sql`EXISTS(
+                        SELECT * FROM
                         ${projectTags}
-                        INNER
-                        JOIN
-                        ${tags}
-                        ON
-                        ${tags.id}
-                        =
-                        ${projectTags.tagId}
                         WHERE
                         ${projectTags.projectId}
                         =
                         ${projects.id}
                         AND
-                        ${tags.title}
+                        ${projectTags.tagId}
                         IN
                         (
-                        ${sql.join(normalizedTags.map(t => sql`${t}`), sql`,`)}
+                        ${sql.join(normalizedTags.map(tag => sql`${tag}`), sql`,`)}
                         )
                         )`
-                    );
-
+                    )
                 }
 
             }
