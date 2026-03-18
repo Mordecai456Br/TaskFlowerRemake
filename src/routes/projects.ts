@@ -1,5 +1,5 @@
 import express from 'express';
-import {and, count, desc, eq, getTableColumns, ilike, or, sql} from "drizzle-orm";
+import {and, desc, eq, getTableColumns, ilike, or, sql} from "drizzle-orm";
 import {categoriesOfProject, projects, projectTags, tags} from "../database/schema";
 import {neonDatabase} from "../database";
 import {formatQueryString} from "./helpers/queryStringFormater";
@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
                         SELECT ${projectTags.projectId}
                         FROM ${projectTags}
                         WHERE ${projectTags.projectId} = ${projects.id}
-                        AND ${projectTags.tagId} IN (${sql.join(normalizedTags.map(t => sql`${t}`), sql`,`)})
+                        AND ${projectTags.tagId} IN (${sql.join(normalizedTags.map(tag => sql`${tag}`), sql`,`)})
                         GROUP BY ${projectTags.projectId}
                         HAVING COUNT(DISTINCT ${projectTags.tagId}) = ${normalizedTags.length}
     )`
