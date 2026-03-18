@@ -14,6 +14,7 @@ export const projects = pgTable("projects", {
     mediaUrl: varchar("media_url"),
     githubUrl: varchar("github_url"),
     createdByUser: text('created_by_user').references(() => user.id).notNull(),
+
     ...timestamps
 });
 
