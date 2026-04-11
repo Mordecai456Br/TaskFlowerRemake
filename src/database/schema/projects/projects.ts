@@ -1,4 +1,4 @@
-import { integer, pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import {boolean, integer, pgTable, serial, text, varchar} from "drizzle-orm/pg-core";
 import { timestamps } from "../../helpers";
 import { categoriesOfProject } from "./categoriesOfProjects";
 import {user} from "../auth/auth";
@@ -14,7 +14,7 @@ export const projects = pgTable("projects", {
     mediaUrl: varchar("media_url"),
     githubUrl: varchar("github_url"),
     createdByUser: text('created_by_user').references(() => user.id).notNull(),
-
+isPublic: boolean('is_public').notNull().default(false),
     ...timestamps
 });
 

@@ -120,6 +120,13 @@
       "when": 1773434333016,
       "tag": "0016_cool_emma_frost",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1775947490252,
+      "tag": "0017_new_shen",
+      "breakpoints": true
     }
   ]
 }
