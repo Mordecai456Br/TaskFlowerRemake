@@ -15,6 +15,7 @@ export const projects = pgTable("projects", {
     githubUrl: varchar("github_url"),
     createdByUser: text('created_by_user').references(() => user.id).notNull(),
 isPublic: boolean('is_public').notNull().default(false),
+isPinned: boolean('is_public').notNull().default(false),
     ...timestamps
 });
 
