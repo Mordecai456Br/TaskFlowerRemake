@@ -134,6 +134,13 @@
       "when": 1775953574023,
       "tag": "0018_tranquil_iron_fist",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1775954361793,
+      "tag": "0019_shocking_moonstone",
+      "breakpoints": true
     }
   ]
 }
