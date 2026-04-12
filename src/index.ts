@@ -17,7 +17,26 @@ if(!process.env.FRONTEND_URL) throw new Error("Missing FRONTEND_URL in .env file
 if(!process.env.CLIENT_URL) throw new Error("Missing FRONTEND_URL in .env file");
 
 app.use(cors({
-    origin: [process.env.CLIENT_URL, process.env.FRONTEND_URL],
+    origin: (origin, callback) => {
+        // permite requests sem origin (Postman, mobile, etc)
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = [
+            process.env.CLIENT_URL,
+            process.env.FRONTEND_URL,
+        ];
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        if (origin.endsWith('.vercel.app')) {
+            return callback(null, true);
+        }
+
+        return callback(new Error('Not allowed by CORS'));
+    },
+
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
