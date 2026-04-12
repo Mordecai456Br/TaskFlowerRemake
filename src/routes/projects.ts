@@ -141,6 +141,52 @@ router.get('/', async (req, res) => {
     }
 );
 
+router.get('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const projectId = Number(id);
+
+        if (!projectId) {
+            return res.status(400).json({ error: 'Invalid project id' });
+        }
+
+        const [project] = await neonDatabase
+            .select({
+                ...getTableColumns(projects),
+                category: { ...getTableColumns(categoriesOfProject) },
+                tags: sql`
+                    COALESCE(
+                        json_agg(
+                            DISTINCT jsonb_build_object(
+                                'id', ${tags.id},
+                                'name', ${tags.title}
+                            )
+                        )
+                        FILTER (WHERE ${tags.id} IS NOT NULL),
+                        '[]'
+                    )
+                `
+            })
+            .from(projects)
+            .leftJoin(categoriesOfProject, eq(projects.categoryId, categoriesOfProject.id))
+            .leftJoin(projectTags, eq(projectTags.projectId, projects.id))
+            .leftJoin(tags, eq(tags.id, projectTags.tagId))
+            .where(eq(projects.id, projectId))
+            .groupBy(projects.id, categoriesOfProject.id);
+
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        return res.status(200).json(project);
+
+    } catch (error) {
+        console.error(`GET /projects/:id error: ${error}`);
+        res.status(500).json({ error: 'Failed to get project' });
+    }
+});
+
 router.post('/', async (req, res) => {  
     try {
 
@@ -210,13 +256,13 @@ router.put('/:id', async (req, res) => {
         const [updatedProject] = await neonDatabase
             .update(projects)
             .set({
-                title,
-                description,
-                categoryId,
-                mediaUrl,
-                githubUrl,
-                isPinned,
-                isPublic
+                ...(title !== undefined && { title }),
+                ...(description !== undefined && { description }),
+                ...(categoryId !== undefined && { categoryId }),
+                ...(mediaUrl !== undefined && { mediaUrl }),
+                ...(githubUrl !== undefined && { githubUrl }),
+                ...(isPinned !== undefined && { isPinned }),
+                ...(isPublic !== undefined && { isPublic }),
             })
             .where(eq(projects.id, projectId))
             .returning();

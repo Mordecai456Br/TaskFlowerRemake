@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/', async(req, res) => {
 
     try {
-        const { name } = req.body;
+        const { name, color, bgcolor } = req.body;
         if (!name) {
             return res.status(400).json({ error: 'name is required' });
         }
@@ -26,7 +26,9 @@ router.post('/', async(req, res) => {
         const [newCategoryOfProject] = await neonDatabase
             .insert(categoriesOfProject)
             .values({
-                name: name
+                name: name,
+                color: color || '#ffffff',
+                bgColor: bgcolor || '#333333',
             })
             .returning();
         res.status(201).json(newCategoryOfProject);
@@ -41,7 +43,9 @@ router.get('/', async (req, res) => {
         const findTag = await neonDatabase
             .select({
                 id: categoriesOfProject.id,
-                name: categoriesOfProject.name
+                name: categoriesOfProject.name,
+                color: categoriesOfProject.color,
+                bgColor: categoriesOfProject.bgColor
             })
             .from(categoriesOfProject)
         const result = findTag;

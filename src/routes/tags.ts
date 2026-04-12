@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/', async (req, res) => {
 
     try {
-        const { title, typeId} = req.body; 
+        const { title, typeId, color, bgColor} = req.body;
         if (!title) {
             return res.status(400).json({ error: 'Missing required fields: title, typeId' });
         }
@@ -25,7 +25,9 @@ router.post('/', async (req, res) => {
             .insert(tags)
             .values({
                 title: title,
-                typeId
+                typeId: typeId,
+                color: color || '#ffffff',
+                bgColor: bgColor || '#333333',
             })
             .returning();
         res.status(201).json(newTag);
