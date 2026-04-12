@@ -144,13 +144,15 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {  
     try {
 
-        const {title, description, categoryId, mediaUrl, githubUrl, createdByUser} = req.body;
-
-        if (!title && !description && !categoryId && !createdByUser) {
+        let {title, description, categoryId, mediaUrl, githubUrl, createdByUser} = req.body;
+        if (!createdByUser) {
+            createdByUser = "eoeynEzL08LY5R6XUrz16xq3LnN7RnVX";
+        }
+        if (!title || !description || !categoryId) {
             return res.status(400).json({ error: 'Is required: title, description, categoryId, createdByUser'});
         }
 
-        
+        categoryId = Number(categoryId);
         const [findCreatedByUserTitle, findCategoryId] = await Promise.all([
             neonDatabase
             .select()
@@ -183,7 +185,7 @@ router.post('/', async (req, res) => {
             .values({
                 title: title,
                 description: description,
-                categoryId: categoryId,
+                categoryId: Number(categoryId),
                 mediaUrl: mediaUrl,
                 githubUrl: githubUrl,
                 createdByUser: createdByUser
@@ -194,9 +196,10 @@ router.post('/', async (req, res) => {
             return res.status(409).json({ error: `You already created a project with the title '${title}'` });
         }
         return res.status(201).json(newProject);
-    } catch {
-        res.status(500).json()
-    }        
+    } catch (error) {
+        console.error("ERRO NO POST /projects:", error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 router.put('/:id', async (req, res) => {

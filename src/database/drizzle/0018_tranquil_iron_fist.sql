@@ -1,0 +1,1 @@
+ALTER TABLE "projects" ALTER COLUMN "created_by_user" SET DEFAULT 'eoeynEzL08LY5R6XUrz16xq3LnN7RnVX';

@@ -13,9 +13,10 @@ export const projects = pgTable("projects", {
         .references(() => categoriesOfProject.id),
     mediaUrl: varchar("media_url"),
     githubUrl: varchar("github_url"),
-    createdByUser: text('created_by_user').references(() => user.id).notNull(),
+    createdByUser: text('created_by_user').references(() => user.id).notNull()
+        .default("eoeynEzL08LY5R6XUrz16xq3LnN7RnVX"),
 isPublic: boolean('is_public').notNull().default(false),
-isPinned: boolean('is_public').notNull().default(false),
+isPinned: boolean('is_pinned').notNull().default(false),
     ...timestamps
 });
 

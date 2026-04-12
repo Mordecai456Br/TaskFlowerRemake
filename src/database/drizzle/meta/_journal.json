@@ -127,6 +127,13 @@
       "when": 1775947490252,
       "tag": "0017_new_shen",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1775953574023,
+      "tag": "0018_tranquil_iron_fist",
+      "breakpoints": true
     }
   ]
 }
