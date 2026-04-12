@@ -14,9 +14,10 @@ const app = express();
 const port = 3000;
 
 if(!process.env.FRONTEND_URL) throw new Error("Missing FRONTEND_URL in .env file");
+if(!process.env.CLIENT_URL) throw new Error("Missing FRONTEND_URL in .env file");
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [process.env.CLIENT_URL, process.env.FRONTEND_URL],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
@@ -33,7 +34,7 @@ app.use('/api/projects', projectsRouter);
 app.use('/api/tag-type', tagTypesRouter);
 app.use('/api/tag', tagRouter);
 app.use('/api/project-tags', projectTags);
-app.use('/api/categories-project', categorieProject);
+app.use('/api/categories', categorieProject);
 app.use('/api/projects/create-project', projectsRouter);
 app.use('/api/stages', stages);
 

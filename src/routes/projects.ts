@@ -203,7 +203,7 @@ router.put('/:id', async (req, res) => {
     try {
         const {id}  = req.params;
         const projectId = Number(id);
-        const { title, description, categoryId, mediaUrl, githubUrl } = req.body;
+        const { title, description, categoryId, mediaUrl, githubUrl, isPinned, isPublic } = req.body;
         const [updatedProject] = await neonDatabase
             .update(projects)
             .set({
@@ -211,7 +211,9 @@ router.put('/:id', async (req, res) => {
                 description,
                 categoryId,
                 mediaUrl,
-                githubUrl
+                githubUrl,
+                isPinned,
+                isPublic
             })
             .where(eq(projects.id, projectId))
             .returning();
